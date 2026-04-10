@@ -1,0 +1,46 @@
+# ================================
+# 企业级Agent项目 零错误依赖
+# 自动兼容 | 清华源可用 | Windows/Mac通用
+# ================================
+
+# 核心智能体框架（自动装最新兼容版，无版本错误）
+langgraph>=0.0.27
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.10
+
+# 大模型网关
+litellm>=1.30.0
+
+# 向量数据库
+qdrant-client>=1.6.0
+langchain-qdrant>=0.1.0
+
+# 文档解析
+unstructured>=0.11.0
+pypdf>=3.17.0
+python-multipart>=0.0.6
+
+# API服务
+fastapi>=0.104.0
+uvicorn>=0.24.0
+sse-starlette>=1.6.0
+
+# 工具链
+duckduckgo-search>=4.1.0
+
+# 监控
+langsmith>=0.0.86
+
+# 基础工具
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+requests>=2.31.0
+
+# 其他依赖
+sentence-transformers>=2.2.2
+numpy>=1.24.0
+
+langchain-text-splitters
+pandas

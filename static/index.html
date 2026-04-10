@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业级智能任务助理</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h2>智能助手</h2>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-comments"></i> 聊天功能</h3>
+                <button class="sidebar-btn active" onclick="switchTab('chat')">
+                    <i class="fas fa-comment-dots"></i> 智能对话
+                </button>
+                <button class="sidebar-btn" onclick="switchTab('stream-chat')">
+                    <i class="fas fa-bolt"></i> 流式对话
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-database"></i> 知识库</h3>
+                <button class="sidebar-btn" onclick="switchTab('knowledge')">
+                    <i class="fas fa-upload"></i> 上传文档
+                </button>
+                <button class="sidebar-btn" onclick="switchTab('knowledge-list')">
+                    <i class="fas fa-list"></i> 文档管理
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-tools"></i> 工具</h3>
+                <button class="sidebar-btn" onclick="switchTab('tools')">
+                    <i class="fas fa-wrench"></i> 工具列表
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fas fa-cog"></i> 系统</h3>
+                <button class="sidebar-btn" onclick="switchTab('health')">
+                    <i class="fas fa-heartbeat"></i> 健康检查
+                </button>
+                <button class="sidebar-btn" onclick="switchTab('docs')">
+                    <i class="fas fa-book"></i> API文档
+                </button>
+            </div>
+            
+            <div class="system-info">
+                <p><i class="fas fa-server"></i> 服务状态: <span id="status-indicator">运行中</span></p>
+                <p><i class="fas fa-bolt"></i> 版本: 1.0.0</p>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 聊天界面 -->
+            <div id="chat-tab" class="tab-content active">
+                <div class="chat-header">
+                    <h2><i class="fas fa-comment-dots"></i> 智能对话</h2>
+                    <div class="chat-actions">
+                        <button class="action-btn" onclick="clearChat()" title="清空对话">
+                            <i class="fas fa-trash"></i> 清空
+                        </button>
+                        <button class="action-btn" onclick="exportChat()" title="导出对话">
+                            <i class="fas fa-download"></i> 导出
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-container">
+                    <div class="messages" id="chat-messages">
+                        <!-- 消息会动态添加到这里 -->
+                        <div class="message welcome">
+                            <div class="message-content">
+                                <strong>🤖 智能助手</strong>
+                                <p>您好！我是企业级智能任务助理，我可以：</p>
+                                <ul>
+                                    <li>回答您的问题（基于知识库）</li>
+                                    <li>执行各种工具任务</li>
+                                    <li>处理文件上传和管理</li>
+                                    <li>提供实时流式响应</li>
+                                </ul>
+                                <p>请在下方的输入框中开始对话吧！</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-area">
+                        <div class="input-container">
+                            <input type="text" id="chat-input" placeholder="输入您的问题或指令..." 
+                                   onkeypress="handleChatKeyPress(event)">
+                            <button class="send-btn" onclick="sendChatMessage()">
+                                <i class="fas fa-paper-plane"></i> 发送
+                            </button>
+                        </div>
+                        <div class="input-options">
+                            <label>
+                                <input type="checkbox" id="stream-mode" checked> 启用流式响应
+                            </label>
+                            <span class="hint">按 Enter 发送，Shift+Enter 换行</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 流式聊天界面 -->
+            <div id="stream-chat-tab" class="tab-content">
+                <div class="chat-header">
+                    <h2><i class="fas fa-bolt"></i> 流式对话</h2>
+                    <p class="subtitle">实时流式响应，体验更流畅的对话</p>
+                </div>
+                
+                <div class="chat-container">
+                    <div class="messages" id="stream-messages">
+                        <div class="message welcome">
+                            <div class="message-content">
+                                <strong>⚡ 流式模式</strong>
+                                <p>在此模式下，您可以体验实时的流式响应。</p>
+                                <p>输入问题后，答案会逐字显示，就像真人对话一样！</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-area">
+                        <div class="input-container">
+                            <input type="text" id="stream-input" placeholder="输入问题体验流式响应...">
+                            <button class="send-btn" onclick="sendStreamMessage()">
+                                <i class="fas fa-bolt"></i> 流式发送
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 知识库上传界面 -->
+            <div id="knowledge-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-upload"></i> 上传文档到知识库</h2>
+                    <p class="subtitle">上传文档后，智能助手可以从文档中学习并回答问题</p>
+                </div>
+                
+                <div class="upload-container">
+                    <div class="upload-area" id="drop-area">
+                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                        <h3>拖放文件到此处</h3>
+                        <p>或点击选择文件</p>
+                        <input type="file" id="file-input" multiple style="display: none;">
+                        <button class="upload-btn" onclick="document.getElementById('file-input').click()">
+                            选择文件
+                        </button>
+                        <p class="file-types">支持: PDF, TXT, DOC, DOCX, PPT, PPTX</p>
+                    </div>
+                    
+                    <div class="upload-progress" id="upload-progress" style="display: none;">
+                        <h4>上传进度</h4>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p id="progress-text">准备上传...</p>
+                    </div>
+                    
+                    <div class="uploaded-files" id="uploaded-files">
+                        <!-- 上传的文件列表会显示在这里 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 工具列表界面 -->
+            <div id="tools-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-tools"></i> 可用工具列表</h2>
+                    <p class="subtitle">智能助手可以调用的各种工具</p>
+                </div>
+                
+                <div class="tools-grid" id="tools-grid">
+                    <!-- 工具卡片会动态加载 -->
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> 加载工具列表...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 健康检查界面 -->
+            <div id="health-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-heartbeat"></i> 系统健康检查</h2>
+                    <p class="subtitle">检查系统各组件运行状态</p>
+                </div>
+                
+                <div class="health-container">
+                    <div class="health-card" id="api-health">
+                        <div class="health-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="health-info">
+                            <h3>API服务</h3>
+                            <p class="health-status checking">检查中...</p>
+                            <p class="health-detail">主应用服务</p>
+                        </div>
+                    </div>
+                    
+                    <div class="health-card" id="qdrant-health">
+                        <div class="health-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="health-info">
+                            <h3>向量数据库</h3>
+                            <p class="health-status checking">检查中...</p>
+                            <p class="health-detail">Qdrant向量存储</p>
+                        </div>
+                    </div>
+                    
+                    <div class="health-card" id="model-health">
+                        <div class="health-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="health-info">
+                            <h3>大模型</h3>
+                            <p class="health-status checking">检查中...</p>
+                            <p class="health-detail">豆包大模型</p>
+                        </div>
+                    </div>
+                    
+                    <div class="health-actions">
+                        <button class="health-btn" onclick="checkAllHealth()">
+                            <i class="fas fa-sync-alt"></i> 重新检查
+                        </button>
+                        <button class="health-btn" onclick="showSystemInfo()">
+                            <i class="fas fa-info-circle"></i> 系统信息
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API文档界面 -->
+            <div id="docs-tab" class="tab-content">
+                <div class="tab-header">
+                    <h2><i class="fas fa-book"></i> API文档</h2>
+                    <p class="subtitle">完整的API接口文档和测试工具</p>
+                </div>
+                
+                <div class="docs-container">
+                    <div class="docs-actions">
+                        <a href="/docs" target="_blank" class="docs-btn">
+                            <i class="fas fa-external-link-alt"></i> 打开Swagger UI
+                        </a>
+                        <a href="/redoc" target="_blank" class="docs-btn">
+                            <i class="fas fa-file-alt"></i> 打开ReDoc
+                        </a>
+                    </div>
+                    
+                    <div class="api-list">
+                        <h3>主要API接口</h3>
+                        <div class="api-item">
+                            <div class="api-method post">POST</div>
+                            <div class="api-info">
+                                <h4>/api/v1/chat</h4>
+                                <p>普通聊天接口，返回完整的JSON响应</p>
+                            </div>
+                        </div>
+                        
+                        <div class="api-item">
+                            <div class="api-method post">POST</div>
+                            <div class="api-info">
+                                <h4>/api/v1/chat/stream</h4>
+                                <p>流式聊天接口，支持实时SSE响应</p>
+                            </div>
+                        </div>
+                        
+                        <div class="api-item">
+                            <div class="api-method post">POST</div>
+                            <div class="api-info">
+                                <h4>/api/v1/knowledge/upload</h4>
+                                <p>上传文档到知识库</p>
+                            </div>
+                        </div>
+                        
+                        <div class="api-item">
+                            <div class="api-method get">GET</div>
+                            <div class="api-info">
+                                <h4>/api/v1/tools</h4>
+                                <p>获取可用工具列表</p>
+                            </div>
+                        </div>
+                        
+                        <div class="api-item">
+                            <div class="api-method get">GET</div>
+                            <div class="api-info">
+                                <h4>/api/v1/health</h4>
+                                <p>系统健康检查</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
